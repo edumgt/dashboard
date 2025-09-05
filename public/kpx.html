@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>전력거래 시계열 차트</title>
+   <link rel="stylesheet" href="./vendor/apexcharts/dist/apexcharts.css" />
+  <script src="./vendor/apexcharts/dist/apexcharts.js"></script>
+  <script src="./vendor/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h2 style="text-align:center;">⚡ 전력거래 시계열 차트</h2>
+  <div id="chart"></div>
+
+  <script>
+    const url =
+      "https://api.odcloud.kr/api/15065266/v1/uddi:2fdba185-7174-4b2a-b324-acdeab2ee056?page=1&perPage=10&serviceKey=85ce971033ed5ac42638fd66e56c14bd381d6ed61f40953b97bc60730aca620b";
+
+    axios.get(url)
+      .then(res => {
+        const raw = res.data.data;  // ✅ axios는 res.data 바로 사용 가능
+
+        // X축 (1시 ~ 24시)
+        const hours = Array.from({ length: 24 }, (_, i) => (i + 1) + "시");
+
+        // 날짜별 시리즈 변환
+        const series = raw.map(day => ({
+          name: day["날짜"],
+          data: hours.map(h => Number(day[h]))
+        }));
+
+        const options = {
+          chart: {
+            type: "line",
+            height: 500,
+            zoom: { enabled: true }
+          },
+          series: series,
+          xaxis: {
+            categories: hours,
+            title: { text: "시간대" }
+          },
+          yaxis: {
+            title: { text: "전력수요량 (MW)" },
+            labels: { formatter: val => val.toLocaleString() }
+          },
+          tooltip: {
+            shared: true,
+            y: { formatter: val => val.toLocaleString() + " MW" }
+          },
+          legend: {
+            position: "top",
+            horizontalAlign: "center"
+          },
+          colors: ["#3B82F6", "#F59E0B", "#10B981", "#EF4444", "#8B5CF6",
+                   "#06B6D4", "#84CC16", "#E11D48", "#6366F1", "#F97316"]
+        };
+
+        new ApexCharts(document.querySelector("#chart"), options).render();
+      })
+      .catch(err => {
+        console.error("API 에러:", err);
+        document.getElementById("chart").innerHTML =
+          "<p style='color:red'>데이터를 불러오지 못했습니다.</p>";
+      });
+  </script>
+</body>
+</html>
