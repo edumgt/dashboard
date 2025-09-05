@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gumi PC방 이용료 Scatter</title>
+  <link rel="stylesheet" href="./vendor/apexcharts/dist/apexcharts.css" />
+  <script src="./vendor/apexcharts/dist/apexcharts.js"></script>
+</head>
+<body>
+  <h2 style="text-align:center;">📊 구미 PC방 이용료 Scatter 차트</h2>
+  <div id="chart"></div>
+
+  <script>
+    // 실제 JSON 구조 대응
+    fetch(`https://apis.data.go.kr/5080000/pricesInfoService/getPricesInfo?serviceKey=85ce971033ed5ac42638fd66e56c14bd381d6ed61f40953b97bc60730aca620b&pageNo=1&numOfRows=100`) // 또는 API 엔드포인트
+      .then(res => res.json())
+      .then(json => {
+        const data = json.body; // body 배열 추출
+
+        // Scatter 데이터 변환
+        const seriesData = data.map(item => ({
+          x: item.se,   // 행정구역명
+          y: item.pc    // 가격
+        }));
+
+        const options = {
+          chart: {
+            type: "scatter",
+            height: 350,
+            zoom: { enabled: true, type: "xy" }
+          },
+          series: [{
+            name: "PC방 이용료",
+            data: seriesData
+          }],
+          xaxis: {
+            type: "category",
+            title: { text: "행정구역" }
+          },
+          yaxis: {
+            title: { text: "이용료 (원)" },
+            min: 0
+          },
+          tooltip: {
+            custom: function({ dataPointIndex }) {
+              const item = data[dataPointIndex];
+              return `
+                <div style="padding:8px">
+                  <b>${item.se}</b><br/>
+                  ${item.prdlst_nm} : ${item.pc.toLocaleString()}원<br/>
+                  기준일: ${item.date_stdde}
+                </div>
+              `;
+            }
+          },
+          colors: ["#3B82F6"]
+        };
+
+        const chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+      })
+      .catch(err => {
+        console.error("데이터 로드 실패:", err);
+      });
+  </script>
+</body>
+</html>
