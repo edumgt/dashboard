@@ -12,7 +12,8 @@
 
   <script>
     // 실제 JSON 구조 대응
-    fetch(`https://apis.data.go.kr/5080000/pricesInfoService/getPricesInfo?serviceKey=85ce971033ed5ac42638fd66e56c14bd381d6ed61f40953b97bc60730aca620b&pageNo=1&numOfRows=100`) // 또는 API 엔드포인트
+    //fetch(`https://apis.data.go.kr/5080000/pricesInfoService/getPricesInfo?serviceKey=85ce971033ed5ac42638fd66e56c14bd381d6ed61f40953b97bc60730aca620b&pageNo=1&numOfRows=100`) // 또는 API 엔드포인트
+    fetch(`http://localhost:3000/api/gumi`) // 또는 API 엔드포인트
       .then(res => res.json())
       .then(json => {
         const data = json.body; // body 배열 추출
